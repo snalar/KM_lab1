@@ -65,7 +65,7 @@ else:
 print("\nМедиана, использованная для восстановления:", float(median))
 print("\nСсылка на очищенный файл:", output_path)
 
-print('Пункт 2')
+print('Пункт 2.1')
 import pandas as pd
 import numpy as np
 from statsmodels.stats.diagnostic import acorr_ljungbox
@@ -85,7 +85,7 @@ if result['bp_pvalue'].values[0] < 0.05:
 else:
     print("Ряд можно считать белым шумом.")
 
-print('Пункт 3')
+print('Пункт 2.2')
 # Повторный запуск: применю фильтр Бесселя (или запасной метод, если scipy недоступен).
 import pandas as pd
 import numpy as np
@@ -162,6 +162,41 @@ if len(numeric_cols) > 0:
     plt.legend()
     plt.tight_layout()
     plt.show()
+
+print('Пункт 3')
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Пути к файлам
+input_path = "RC_F01_09_2024_T01_09_2025.csv"
+output_path = "RC_F01_09_2024_T01_09_2025_ema.csv"
+
+# Загружаем данные
+df = pd.read_csv(input_path)
+col = df.select_dtypes(include="number").columns[0]
+series = df[col].astype(float)
+
+# Применим экспоненциальное скользящее среднее (span=10)
+df["EMA"] = series.ewm(span=10, adjust=False).mean()
+
+# Сохраним
+df.to_csv(output_path, index=False)
+
+# Выведем первые строки
+print("Файл со сглаживанием сохранён как:", output_path)
+print(df.head(10)[[col, "EMA"]])
+
+# Построим график
+plt.figure(figsize=(8,4))
+plt.plot(series, label="Original", alpha=0.7)
+plt.plot(df["EMA"], label="EMA (span=10)", linewidth=2)
+plt.legend()
+plt.title(f"Экспоненциальное скользящее среднее (столбец {col})")
+plt.xlabel("Индекс")
+plt.ylabel("Значение")
+plt.tight_layout()
+plt.show()
+
 
 print('Пункт 4')
 import pandas as pd
